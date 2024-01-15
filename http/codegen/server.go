@@ -970,7 +970,11 @@ const requestElementsT = `{{- define "request_elements" }}
 		openIdx := strings.IndexRune(keyRaw, '[')
 		closeIdx := strings.IndexRune(keyRaw, ']')
 	{{- if eq .Type.KeyType.Type.Name "string" }}
-		key{{ .Loop }} = keyRaw[openIdx+1 : closeIdx]
+		if openIdx > -1 && closeIdx > -1 {
+			key{{ .Loop }} = keyRaw[openIdx+1 : closeIdx]
+		} else {
+			key{{ .Loop }} = keyRaw
+		}
 	{{- else }}
 		key{{ .Loop }}Raw := keyRaw[openIdx+1 : closeIdx]
 		{{- template "type_conversion" (conversionData (printf "key%s" .Loop) "query" .Type.KeyType.Type) }}
