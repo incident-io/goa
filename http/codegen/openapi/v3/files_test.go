@@ -118,7 +118,7 @@ func TestFiles(t *testing.T) {
 							left = buf.String()
 							right = string(want)
 						}
-						assert.Equal(t, left, right)
+						assert.Equal(t, right, left)
 					}
 				})
 			}
