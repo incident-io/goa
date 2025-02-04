@@ -258,7 +258,11 @@ func (sf *schemafier) schemafy(attr *expr.AttributeExpr, noref ...bool) *openapi
 				}
 			}
 		}
-		s.Ref = toRef(uniqueName)
+
+		// There is no type to refer to, generate a new one.
+		typeName := sf.uniquify(codegen.Goify(name, true))
+		s.Ref = toRef(typeName)
+		s.Description = attr.Description
 		sf.hashes[h] = append(sf.hashes[h], s.Ref)
 		sf.schemas[uniqueName] = sf.schemafy(t.Attribute(), true)
 		return s // All other schema properties are set in the reference
@@ -455,6 +459,11 @@ func hashAttribute(att *expr.AttributeExpr, h hash.Hash64, seen map[string]*uint
 		if hv != 0 {
 			*res = orderedHash(*res, hv, h)
 		}
+	}
+
+	// Add description to the hash, since different descriptions must not be deduplicated
+	if att.Description != "" {
+		*res = orderedHash(*res, hashString(att.Description, h), h)
 	}
 
 	return res
