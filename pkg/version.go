@@ -14,7 +14,7 @@ const (
 	// Build number
 	Build = 2
 	// Suffix - set to empty string in release tag commits.
-	Suffix = ""
+	Suffix = "incidentio"
 )
 
 var (
