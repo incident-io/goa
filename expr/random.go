@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net"
 	"strings"
+	"sync"
 
 	"github.com/manveru/faker"
 )
@@ -66,10 +67,13 @@ func NewRandom(seed string) *ExampleGenerator {
 type ExampleGenerator struct {
 	Randomizer
 	seen map[string]*any
+	mu   sync.RWMutex
 }
 
 // PreviouslySeen returns the previously seen value for a given ID
 func (r *ExampleGenerator) PreviouslySeen(typeID string) (*any, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	if r.seen == nil {
 		return nil, false
 	}
@@ -79,6 +83,8 @@ func (r *ExampleGenerator) PreviouslySeen(typeID string) (*any, bool) {
 
 // HaveSeen stores the seen value in the randomizer, for reuse later
 func (r *ExampleGenerator) HaveSeen(typeID string, val *any) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	if r.seen == nil {
 		r.seen = make(map[string]*any)
 	}
